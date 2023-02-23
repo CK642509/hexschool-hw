@@ -1,5 +1,6 @@
 const http = require("http");
 const { v4: uuidv4 } = require("uuid")
+const errorHandle = require("./errorHandle")
 const todos = []
 
 const requestListener = (req, res) => {
@@ -45,23 +46,23 @@ const requestListener = (req, res) => {
                 res.end();
             } catch (err) {
                 console.log(err, "error");
-                res.writeHead(400, headers);
-                res.write(JSON.stringify({
-                    "status": "false",
-                    "message": "wrong format, or no this todo exist"
-                }));
-                res.end();
+                errorHandle(res)
             }
             
         })
         
         
+    
+    } else if (req.url === "/todos" && req.method === "DELETE") {
+        todos.length = 0;
+        res.writeHead(200, headers);
+        res.write(JSON.stringify({
+            "status": "success",
+            "data": todos
+        }));
+        res.end();
     } else if (req.method === "OPTIONS") {
         res.writeHead(200, headers);
-        res.end();
-    } else if (req.url === "/" && req.method === "DELETE") {
-        res.writeHead(200, headers);
-        res.write("delete");
         res.end();
     } else {
         res.writeHead(404, headers);
