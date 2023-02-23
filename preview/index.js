@@ -75,7 +75,6 @@ const requestListener = (req, res) => {
         } else {
             errorHandle(res)
         }
-        res.writ
     } else if (req.method === "OPTIONS") {
         res.writeHead(200, headers);
         res.end();
