@@ -50,9 +50,6 @@ const requestListener = (req, res) => {
             }
             
         })
-        
-        
-    
     } else if (req.url === "/todos" && req.method === "DELETE") {
         todos.length = 0;
         res.writeHead(200, headers);
@@ -75,6 +72,28 @@ const requestListener = (req, res) => {
         } else {
             errorHandle(res)
         }
+    } else if (req.url.startsWith("/todos/") && req.method === "PATCH") {
+        req.on("end", () => {
+            try {
+                const title = JSON.parse(body).title;
+                const id = req.url.split("/").pop();
+                const index = todos.findIndex(element => element.id === id);
+                if (title !== undefined && index !== -1) {
+                    todos[index].title = title
+                    res.writeHead(200, headers);
+                    res.write(JSON.stringify({
+                        "status": "success",
+                        "data": todos
+                    }));
+                    res.end();
+                } else {
+                    errorHandle(res)
+                }
+            } catch (err) {
+                console.log(err, "error");
+                errorHandle(res)
+            }  
+        })
     } else if (req.method === "OPTIONS") {
         res.writeHead(200, headers);
         res.end();
