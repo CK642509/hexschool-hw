@@ -11,7 +11,13 @@ const requestListener = (req, res) => {
     console.log(req.method);
     if (req.url === "/" && req.method === "GET") {
         res.writeHead(200, headers);
-        res.write("hello");
+        res.write(JSON.stringify({
+            "status": "success",
+            "data": []
+        }));
+        res.end();
+    } else if (req.method === "OPTIONS") {
+        res.writeHead(200, headers);
         res.end();
     } else if (req.url === "/" && req.method === "DELETE") {
         res.writeHead(200, headers);
@@ -19,7 +25,10 @@ const requestListener = (req, res) => {
         res.end();
     } else {
         res.writeHead(404, headers);
-        res.write("not found");
+        res.write(JSON.stringify({
+            "status": "failed",
+            "message": "not found"
+        }));
         res.end();
     }
     
