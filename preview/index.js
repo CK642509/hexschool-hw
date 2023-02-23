@@ -1,4 +1,6 @@
 const http = require("http");
+const { v4: uuidv4 } = require("uuid")
+const todos = []
 
 const requestListener = (req, res) => {
     const headers = {
@@ -6,16 +8,54 @@ const requestListener = (req, res) => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'PATCH, POST, GET,OPTIONS,DELETE',
         'Content-Type': 'application/json'
-     }
+    }
+    let body = ""
+
+    req.on("data", chunk => {
+        body += chunk
+    })
+
     console.log(req.url);
     console.log(req.method);
-    if (req.url === "/" && req.method === "GET") {
+    if (req.url === "/todos" && req.method === "GET") {
         res.writeHead(200, headers);
         res.write(JSON.stringify({
             "status": "success",
-            "data": []
+            "data": todos
         }));
         res.end();
+    } else if (req.url === "/todos" && req.method === "POST") {
+        req.on("end", () => {
+            try {
+                const title = JSON.parse(body).title;
+                if (title === undefined) {
+                    throw "no title"
+                }
+                const todo = {
+                    "title": title,
+                    "id": uuidv4()
+                };
+                todos.push(todo);
+    
+                res.writeHead(200, headers);
+                res.write(JSON.stringify({
+                    "status": "success",
+                    "data": todos
+                }));
+                res.end();
+            } catch (err) {
+                console.log(err, "error");
+                res.writeHead(400, headers);
+                res.write(JSON.stringify({
+                    "status": "false",
+                    "message": "wrong format, or no this todo exist"
+                }));
+                res.end();
+            }
+            
+        })
+        
+        
     } else if (req.method === "OPTIONS") {
         res.writeHead(200, headers);
         res.end();
