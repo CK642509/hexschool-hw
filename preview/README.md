@@ -2,5 +2,5 @@
 
 ```
 npm install
-nodemon index.js
+npx nodemon index.js
 ```
